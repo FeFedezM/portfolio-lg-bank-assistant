@@ -1,0 +1,13 @@
+langgraph
+langgraph-prebuilt
+langgraph-sdk
+langgraph-checkpoint-postgres
+langchain-community
+langchain-core
+langchain-openai
+langchain-ollama
+notebook
+tavily-python
+wikipedia
+langgraph-cli[inmem]
+psycopg[binary,pool]

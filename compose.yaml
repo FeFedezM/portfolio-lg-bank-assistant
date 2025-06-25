@@ -1,0 +1,67 @@
+services:
+
+  jupyter:
+    build: ./jupyter
+    ports:
+      - 8888:8888
+    volumes:
+      - ./jupyter/app:/app
+      - ./main/app/graphs:/app/graphs
+    env_file:
+      - ./env/.env
+      - ./env/db.env
+      - ./env/keys.env
+    develop:
+      watch:
+        - path: ./jupyter/app/requirements.txt
+          action: rebuild
+
+
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - ./Ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    env_file:
+      - ./env/db.env
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+
+  main:
+    build: ./main
+    container_name: main
+    ports:
+      - 8000:80
+    volumes:
+    - ./main/app:/app
+    env_file:
+      - ./env/.env
+      - ./env/db.env
+      - ./env/keys.env
+    develop:
+      watch:
+        - path: ./main/app/requirements.txt
+          action: rebuild
+
+
+  

@@ -1,0 +1,18 @@
+#The current data of postgres
+db/*
+
+#The ollama models
+Ollama/*
+
+#The API keys
+env/keys.env
+
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook
+.ipynb_checkpoints
