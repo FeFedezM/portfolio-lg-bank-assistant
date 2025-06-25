@@ -16,7 +16,6 @@ services:
         - path: ./jupyter/app/requirements.txt
           action: rebuild
 
-
   ollama:
     container_name: ollama
     image: ollama/ollama:latest
@@ -62,6 +61,23 @@ services:
       watch:
         - path: ./main/app/requirements.txt
           action: rebuild
+
+  qdrant:
+    image: qdrant/qdrant:v1.14.1-gpu-nvidia
+    container_name: qdrant
+    ports:
+      - 6333:6333
+    volumes:
+      - ./qdrant:/qdrant/storage
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+
 
 
   
