@@ -12,3 +12,7 @@ wikipedia
 langgraph-cli[inmem]
 psycopg[binary,pool]
 qdrant-client
+beautifulsoup4
+lxml==5.4
+mcp
+
