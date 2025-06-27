@@ -52,7 +52,7 @@ services:
     ports:
       - 8000:80
     volumes:
-    - ./main/app:/app
+      - ./main/app:/app
     env_file:
       - ./env/.env
       - ./env/db.env
@@ -76,6 +76,18 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+
+  hub:
+    build: ./hub
+    container_name: hub
+    ports:
+      - 8001:80
+    volumes:
+      - ./hub/app:/app
+    develop:
+      watch:
+        - path: ./main/app/requirements.txt
+          action: rebuild
 
 
 
