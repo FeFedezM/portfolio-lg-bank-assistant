@@ -1,14 +1,15 @@
-from typing import Union
 from fastapi import FastAPI
-
-from mcp import ClientSession, StdioServerParameters, types
-from mcp.client.stdio import stdio_client
-from mcp.client.streamable_http import streamablehttp_client
-
-import json
 
 ##import add module
 import asyncio
+
+from mcp import ClientSession
+from mcp.client.stdio import stdio_client
+
+from utilities import json_loader, DepStdioParams, CalledTool
+
+stdio_servers =json_loader('servers/stdio-config.json')
+
 
 app = FastAPI()
 
@@ -17,37 +18,56 @@ def read_root():
 
     return {"Hello": "world"}
 
+@app.get("/playground/")
+async def playground():
+
+    return {'hi': 'hi'}
+
+@app.get("/stdio/list/servers")
+async def get_servers():
+
+    list_of_servers: dict = await stdio_servers.aGetJson()
+
+    
+    return list(list_of_servers['mcpServers'].keys())
+
 @app.get("/stdio/list/tools/{name}")
-async def list_tools(name:str):
+async def list_tools(server_params: DepStdioParams):
 
+    if server_params == {}:
+        return {'error': 'Model not foud'}
 
-#    async with aiofiles.open('/servers/stdio-config.json', mode='r') as file:
-#        content = await file.read()
-#        servers = json.loads(content)
-
-    with open('servers/stdio-config.json', 'r') as f:
-        servers = json.load(f)
-
-    
-    params = servers['mcpServers'].get(name,'')
-
-    if not params:
-
-        return {'error': 'Server config not found'}
-
-    
-    stdio_params = StdioServerParameters.parse_obj(params)
-
-    async with stdio_client(stdio_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(
+            read, write) as session:
+            # Initialize the connection
             await session.initialize()
 
-            response = await session.list_tools()
+            res = await session.list_tools()
 
-            
+    return res.tools        
+        
+@app.post("/stdio/call/tools/{name}")
+async def list_tools(server_params: DepStdioParams, tools: list[CalledTool]):
 
-            formated_tools = [dict(t) for t in response.tools]
+    if server_params == {}:
+        return {'error': 'Model not foud'}
+    
+    responses = []
 
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(
+            read, write) as session:
+            # Initialize the connection
+            await session.initialize()
 
-    return formated_tools
+            for tool in tools:
+
+                try:
+                    response =  await session.call_tool(name=tool.name, arguments=tool.arguments)
+                    responses.append(response)
+                except:
+                    responses.append({'error': f"error calling tool '{tool.name}' with arguments: {tool.arguments}"})
+
+ 
+    return responses       

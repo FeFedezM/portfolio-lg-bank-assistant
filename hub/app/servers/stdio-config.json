@@ -6,6 +6,14 @@
         "-y",
         "@modelcontextprotocol/server-everything"
       ]
-    }
+    },
+    "fetch": {
+      "command": "python",
+      "args": ["-m", "mcp_server_fetch"]
+    },
+    "time": {
+        "command": "python",
+        "args": ["-m", "mcp_server_time"]
+    }  
   }
 }
