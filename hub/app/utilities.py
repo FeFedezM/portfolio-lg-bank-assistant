@@ -13,7 +13,7 @@ This File is a custom library with utilities for using the HUB API
 ################################################################################################################################################################################################################
 
 #For FASTAPI
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 #For async progrmming
 import asyncio
@@ -24,13 +24,13 @@ from contextlib import AsyncExitStack
 import json
 
 #For Data structures
-from typing import Annotated, Optional
+from typing import Annotated
 from pydantic import BaseModel
 
 #For MCP client
-from mcp import ClientSession, StdioServerParameters, types
-from mcp.client.stdio import stdio_client
-from mcp.client.streamable_http import streamablehttp_client
+from mcp import StdioServerParameters
+from mcp.types import CallToolResult
+
  
 
 ################################################################################################################################################################################################################
@@ -48,6 +48,11 @@ class CalledTool(BaseModel):
 
     name: str 
     arguments: dict
+
+class CallToolResultWName(CallToolResult):
+    """An extention of the MCP CallToolResult data structure, but adding the name of the called tool"""
+
+    name: str
 
 ################################################################################################################################################################################################################
 #     CLASSES
@@ -83,7 +88,7 @@ async def get_stdio_params(name: str):
 
     if not params:
 
-        return {}
+        raise HTTPException(status_code=404, detail="Server not found")
 
     
     stdio_params = StdioServerParameters.parse_obj(params)

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 ##import add module
 import asyncio
@@ -6,7 +6,7 @@ import asyncio
 from mcp import ClientSession
 from mcp.client.stdio import stdio_client
 
-from utilities import json_loader, DepStdioParams, CalledTool
+from utilities import json_loader, DepStdioParams, CalledTool, CallToolResultWName
 
 stdio_servers =json_loader('servers/stdio-config.json')
 
@@ -34,9 +34,6 @@ async def get_servers():
 @app.get("/stdio/list/tools/{name}")
 async def list_tools(server_params: DepStdioParams):
 
-    if server_params == {}:
-        return {'error': 'Model not foud'}
-
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(
             read, write) as session:
@@ -45,14 +42,11 @@ async def list_tools(server_params: DepStdioParams):
 
             res = await session.list_tools()
 
-    return res.tools        
+    return res.tools
         
 @app.post("/stdio/call/tools/{name}")
 async def list_tools(server_params: DepStdioParams, tools: list[CalledTool]):
 
-    if server_params == {}:
-        return {'error': 'Model not foud'}
-    
     responses = []
 
     async with stdio_client(server_params) as (read, write):
@@ -65,9 +59,15 @@ async def list_tools(server_params: DepStdioParams, tools: list[CalledTool]):
 
                 try:
                     response =  await session.call_tool(name=tool.name, arguments=tool.arguments)
-                    responses.append(response)
+                    responsewname = CallToolResultWName(**response.model_dump(), name = tool.name)
+                    responses.append(responsewname)
                 except:
-                    responses.append({'error': f"error calling tool '{tool.name}' with arguments: {tool.arguments}"})
+                    responses.append({"isError": True, 
+                                      "name": tool.name,
+                                      "content":{ 
+                                          "type": "text",                                          
+                                          'text': f"error calling tool '{tool.name}' with arguments: {tool.arguments}"}
+                                          })
 
  
     return responses       
