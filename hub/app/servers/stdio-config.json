@@ -9,11 +9,15 @@
     },
     "fetch": {
       "command": "python",
-      "args": ["-m", "mcp_server_fetch"]
+      "args": ["-m", "mcp_server_fetch","--ignore-robots-txt"]
     },
     "time": {
         "command": "python",
         "args": ["-m", "mcp_server_time"]
-    }  
+    },
+    "ddg-search": {
+            "command": "uvx",
+            "args": ["duckduckgo-mcp-server"]
+    }
   }
 }

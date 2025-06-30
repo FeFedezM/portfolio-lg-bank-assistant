@@ -41,7 +41,7 @@ def MCP_TOOL_NODE_GENERATOR(server_name:str , transport:str='stdio', hub_url = N
     url = f"{hub_url.rstrip('/')}/{transport}/call/tools/{server_name}"
 
 
-    def TOOL_NODE(state: MessagesState) -> dict:
+    def TOOL_NODE(state: MessagesState):
 
         tool_calls = state['messages'][-1].tool_calls
 
@@ -80,7 +80,7 @@ def MCP_LLM_NODE_GENERATOR(server_name:str):
 
     tools = get_tools(server_name) ##TO ADD FUNCTIONALITIES FOR TE URL
 
-    def LLM_NODE(state: MessagesState, config: RunnableConfig) -> dict:
+    def LLM_NODE(state: MessagesState, config: RunnableConfig):
 
         llm_base = config['configurable']['llm']
         llm = llm_base.bind_tools(tools)
