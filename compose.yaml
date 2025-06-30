@@ -9,8 +9,9 @@ services:
       - ./main/app/graphs:/app/graphs
     env_file:
       - ./env/.env
-      - ./env/db.env
+      - ./env/psql.env
       - ./env/keys.env
+      - ./env/mongo.env
     develop:
       watch:
         - path: ./jupyter/app/requirements.txt
@@ -39,7 +40,7 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
     env_file:
-      - ./env/db.env
+      - ./env/psql.env
 
   adminer:
     image: adminer
@@ -55,8 +56,9 @@ services:
       - ./main/app:/app
     env_file:
       - ./env/.env
-      - ./env/db.env
+      - ./env/psql.env
       - ./env/keys.env
+      - ./env/mongo.env
     develop:
       watch:
         - path: ./main/app/requirements.txt
@@ -86,9 +88,25 @@ services:
       - ./hub/app:/app
     develop:
       watch:
-        - path: ./main/app/requirements.txt
+        - path: ./hub/app/requirements.txt
           action: rebuild
 
+  mongo:
+    image: mongo:8
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+          - ./env/mongo.env
+    volumes:
+      - ./mongo:/data/db
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    env_file:
+      - ./env/mongo.env
 
 
 

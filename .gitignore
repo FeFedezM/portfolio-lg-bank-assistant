@@ -10,6 +10,9 @@ env/keys.env
 #Ignore Qdrant data
 qdrant/*
 
+#Ignores Mongo data
+mongo/*
+
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
